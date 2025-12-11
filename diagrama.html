@@ -4,39 +4,275 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diagrama - Actividades de Mejora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; font-family: 'Roboto', Arial, sans-serif; background: linear-gradient(to bottom, #e3f2fd, #bbdefb); min-height: 100vh; color: #2f4f4f; }
-        .navbar { background-color: #1565c0; color: white; padding: 15px 30px; font-size: 20px; font-weight: 500; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); display: flex; justify-content: space-between; align-items: center; }
-        .project-name { font-size: 18px; }
-        .container { max-width: 1300px; margin: 40px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
-        h1 { text-align: center; color: #0d47a1; margin-bottom: 30px; }
-        .mejor-concepto { text-align: center; font-size: 22px; font-weight: 700; color: #1565c0; margin-bottom: 20px; }
-        .opciones-list {
-            margin: 20px auto; padding: 18px; background: #ffffff; border-radius: 10px; border-left: 5px solid #1976d2; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); max-width: 800px;
+        :root {
+            --primary: #0d47a1;
+            --primary-dark: #002171;
+            --primary-light: #1976d2;
+            --background-start: #e8f0fe;
+            --background-end: #bbdefb;
+            --text-dark: #1e3a5f;
+            --text-light: #ffffff;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 12px 28px rgba(13, 71, 161, 0.25);
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --section-bg: #f8fbff;
+            --accent-border: #1976d2;
         }
-        .opciones-list strong { display: block; margin-bottom: 12px; font-size: 16px; color: #0d47a1; }
-        .opciones-list ul { margin: 0; padding-left: 22px; list-style-type: disc; }
-        .opciones-list li { margin-bottom: 10px; font-size: 15px; line-height: 1.5; }
-        .tabla-tareas { margin-top: 50px; }
-        .tarea-row { display: flex; align-items: center; margin-bottom: 40px; padding: 20px; background: #f5fbff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); }
-        .numero { font-size: 36px; font-weight: 700; color: #1976d2; margin-right: 40px; min-width: 80px; text-align: center; }
-        .responsable { flex: 1; margin-right: 60px; }
-        .tarea { flex: 2; }
-        .responsable label, .tarea label { display: block; margin-bottom: 10px; font-weight: 500; color: #1565c0; font-size: 16px; }
-        input[type="text"] { width: 100%; padding: 14px; border: 1px solid #90caf9; border-radius: 8px; font-size: 16px; }
-        .buttons { text-align: center; margin-top: 60px; }
-        .btn-primary { background-color: #1976d2; color: white; padding: 14px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: 500; cursor: pointer; box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3); transition: all 0.3s ease; margin: 10px; }
-        .btn-primary:hover { background-color: #1565c0; transform: translateY(-3px); }
-        .btn-secondary { background-color: #78909c; }
-        .btn-secondary:hover { background-color: #607d8b; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(to bottom, var(--background-start), var(--background-end));
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        header {
+            background-color: var(--primary);
+            color: var(--text-light);
+            padding: 1.25rem 2rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .project-name {
+            font-size: 1.125rem;
+            font-weight: 400;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 2.5rem;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-dark);
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            font-weight: 700;
+        }
+
+        .mejor-concepto {
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+
+        .opciones-list {
+            max-width: 900px;
+            margin: 0 auto 3rem;
+            padding: 1.5rem;
+            background: #ffffff;
+            border-radius: 16px;
+            border-left: 6px solid var(--accent-border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .opciones-list strong {
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .opciones-list ul {
+            margin: 0;
+            padding-left: 1.5rem;
+            list-style-type: disc;
+        }
+
+        .opciones-list li {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .tabla-tareas h2 {
+            text-align: center;
+            color: var(--primary-dark);
+            font-size: 1.75rem;
+            margin-bottom: 3rem;
+            font-weight: 700;
+        }
+
+        .tarea-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.75rem;
+            background: var(--section-bg);
+            border-radius: 16px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .numero {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-light);
+            margin-right: 3rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .responsable,
+        .tarea {
+            flex: 1;
+        }
+
+        .responsable {
+            margin-right: 3rem;
+        }
+
+        .responsable label,
+        .tarea label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            color: var(--primary);
+            font-size: 1.125rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #90caf9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.15);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 4rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-light);
+            color: var(--text-light);
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.125rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary);
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(13, 71, 161, 0.35);
+        }
+
+        .btn-primary:focus-visible {
+            outline: 4px solid #90caf9;
+            outline-offset: 6px;
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: #78909c;
+        }
+
+        .btn-secondary:hover {
+            background-color: #607d8b;
+        }
+
+        @media (max-width: 992px) {
+            .tarea-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .numero {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .responsable {
+                margin-right: 0;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 1rem;
+                font-size: 1.3rem;
+            }
+
+            .container {
+                margin: 2rem 1rem;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .mejor-concepto {
+                font-size: 1.5rem;
+            }
+
+            .numero {
+                font-size: 2.5rem;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-primary {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div>Desarrollo de formularios para actividades de mejora</div>
+    <header role="banner">
+        <div>Desarrollo de Formularios para Actividades de Mejora</div>
         <div class="project-name" id="projectNameDisplay">Proyecto: (Sin nombre)</div>
-    </div>
+    </header>
 
     <div class="container">
         <h1>Diagrama</h1>
@@ -44,7 +280,7 @@
         <div id="mejorConceptoContainer"></div>
 
         <div class="tabla-tareas">
-            <h2 style="text-align: center; color: #0d47a1; margin-bottom: 40px;">Tabla de tareas y responsables</h2>
+            <h2>Tabla de tareas y responsables</h2>
             <div id="tareasContainer"></div>
         </div>
 
