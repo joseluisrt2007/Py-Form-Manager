@@ -904,7 +904,7 @@ function generarPDF() {
 
     let tieneTareas = false;
 
-    // Tareas 1-15
+    // Tareas 1-15 - MODIFICADO
     doc.setFontSize(14);
     doc.setTextColor(13, 71, 161);
     doc.setFont("helvetica", "bold");
@@ -912,17 +912,21 @@ function generarPDF() {
     y += 12;
 
     for (let i = 1; i <= 15; i++) {
-        const tarea = data[`tarea${i}`];
         const persona = data[`persona${i}`];
+        const tarea = data[`tarea${i}`];
+        const salida = data[`salida${i}`]; // NUEVO: Incluir salida
 
-        if (tarea || persona) {
+        if (persona || tarea || salida) { // MODIFICADO: Incluir salida en la condición
             tieneTareas = true;
             doc.setFontSize(12);
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "normal");
-            doc.text(`${i}. ${persona || ""} - ${tarea || ""}`, margen + 10, y);
+            
+            // MODIFICADO: Incluir salida en el texto
+            const texto = `${i}. ${persona || ""} - ${tarea || ""} - ${salida || ""}`;
+            doc.text(texto, margen + 10, y);
             y += 10;
-    
+
             if (y > 280) {
                 doc.addPage();
                 y = margen;
@@ -932,7 +936,7 @@ function generarPDF() {
 
     y += 15;
 
-    // Tareas 16-30
+    // Tareas 16-30 - MODIFICADO
     if (y > 250) {
         doc.addPage();
         y = margen;
@@ -945,17 +949,21 @@ function generarPDF() {
     y += 12;
 
     for (let i = 16; i <= 30; i++) {
-        const tarea = data[`tarea${i}`];
         const persona = data[`persona${i}`];
+        const tarea = data[`tarea${i}`];
+        const salida = data[`salida${i}`]; // NUEVO: Incluir salida
 
-        if (tarea || persona) {
+        if (persona || tarea || salida) { // MODIFICADO: Incluir salida en la condición
             tieneTareas = true;
             doc.setFontSize(12);
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "normal");
-            doc.text(`${i}. ${persona || ""} - ${tarea || ""}`, margen + 10, y);
+            
+            // MODIFICADO: Incluir salida en el texto
+            const texto = `${i}. ${persona || ""} - ${tarea || ""} - ${salida || ""}`;
+            doc.text(texto, margen + 10, y);
             y += 10;
-    
+
             if (y > 280) {
                 doc.addPage();
                 y = margen;

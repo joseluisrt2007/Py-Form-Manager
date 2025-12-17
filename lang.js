@@ -26,7 +26,7 @@ const translations = {
         
         // =================== PÁGINAS ===================
         'criteria_weights': 'Criterios y pesos (la suma debe ser 10)',
-        'ideas_concepts': 'Ideas / Conceptos',
+        'ideas_concepts': 'Ideas',
         'concept_evaluation': 'Evaluación',
         'explore_possibilities': 'Exploración de Posibilidades',
         'concept_formation': 'Formación de Conceptos',
@@ -67,8 +67,10 @@ const translations = {
         
         // =================== DIAGRAMA/TAREAS ===================
         'task': 'Tarea',
-        'responsable_label': 'Responsable',
+        'responsable_label': 'Responsable/Entrada',
         'task_label': 'Tarea',
+        'salida_label': 'Salida', // NUEVO
+        'enter_salida': 'Describe la salida', // NUEVO
         'tasks_1_15': 'Tareas 1-15',
         'tasks_16_30': 'Tareas 16-30',
         
@@ -90,8 +92,8 @@ const translations = {
         'enter_rating': 'Ingrese calificación (0-10)',
         'enter_severity': 'Ingrese severidad (1-10)',
         'enter_occurrence': 'Ingrese ocurrencia (1-10)',
-        'enter_task': 'Ingrese tarea',
-        'enter_responsible': 'Ingrese responsable',
+        'enter_task': 'Ingresa tarea',
+        'enter_responsible': 'Ingresa responsable',
         
         // =================== GC1 (FORMACIÓN DE CONCEPTOS) ===================
         'select_option': 'Seleccionar opción',
@@ -143,7 +145,7 @@ const translations = {
         
         // =================== PAGES ===================
         'criteria_weights': 'Criteria and weights (sum must be 10)',
-        'ideas_concepts': 'Ideas / Concepts',
+        'ideas_concepts': 'Ideas',
         'concept_evaluation': 'Evaluation',
         'explore_possibilities': 'Explore Possibilities',
         'concept_formation': 'Concept Formation',
@@ -184,8 +186,10 @@ const translations = {
         
         // =================== DIAGRAM/TASKS ===================
         'task': 'Task',
-        'responsable_label': 'Responsible',
+        'responsable_label': 'Responsible/Input',
         'task_label': 'Task',
+        'salida_label': 'Output', // NUEVO
+        'enter_salida': 'Describe the output', // NUEJO
         'tasks_1_15': 'Tasks 1-15',
         'tasks_16_30': 'Tasks 16-30',
         

@@ -102,6 +102,9 @@ function generarMejorConcepto() {
 /**
  * Genera las tareas 16 a 30 (continuación de las tareas 1-15)
  */
+/**
+ * Genera las tareas 16 a 30 (continuación de las tareas 1-15)
+ */
 function generarTareas() {
     if (!tareasContainer) return;
     
@@ -116,6 +119,10 @@ function generarTareas() {
         ? t('task_label') || 'Tarea' 
         : 'Tarea';
     
+    const salidaLabel = (typeof t === 'function') 
+        ? t('salida_label') || 'Salida' 
+        : 'Salida';
+    
     const responsablePlaceholder = (typeof t === 'function') 
         ? t('enter_responsible') || 'Ingresa responsable' 
         : 'Ingresa responsable';
@@ -124,15 +131,19 @@ function generarTareas() {
         ? t('enter_task') || 'Describe la tarea' 
         : 'Describe la tarea';
     
+    const salidaPlaceholder = (typeof t === 'function') 
+        ? t('enter_salida') || 'Describe la salida' 
+        : 'Describe la salida';
+    
     // Generar tareas 16 a 30 (continuación)
     for (let i = 16; i <= 30; i++) {
         const responsable = data[`persona${i}`] || '';
         const tarea = data[`tarea${i}`] || '';
+        const salida = data[`salida${i}`] || '';
 
         const tareaDiv = document.createElement('div');
         tareaDiv.className = 'tarea-row';
         tareaDiv.innerHTML = `
-            <div class="numero">${i}</div>
             <div class="responsable">
                 <label>${responsableLabel}</label>
                 <input type="text" value="${responsable}" 
@@ -144,6 +155,12 @@ function generarTareas() {
                 <input type="text" value="${tarea}" 
                        data-key="tarea${i}" 
                        placeholder="${taskPlaceholder}">
+            </div>
+            <div class="salida">
+                <label>${salidaLabel}</label>
+                <input type="text" value="${salida}" 
+                       data-key="salida${i}" 
+                       placeholder="${salidaPlaceholder}">
             </div>
         `;
         tareasContainer.appendChild(tareaDiv);
@@ -180,10 +197,11 @@ function saveAndContinue() {
     const guardarBtn = document.getElementById('guardarBtn');
     if (!guardarBtn) return;
     
-    // Guardar responsables y tareas (16-30)
+    // Guardar responsables, tareas y salidas (16-30)
     document.querySelectorAll('input[data-key]').forEach(input => {
         if (input.dataset.key) {
             data[input.dataset.key] = input.value.trim();
+            // Esto guardará automáticamente: persona16, tarea16, salida16, etc.
         }
     });
     

@@ -116,6 +116,10 @@ function generarTareas() {
         ? t('task_label') || 'Tarea' 
         : 'Tarea';
     
+    const salidaLabel = (typeof t === 'function') 
+        ? t('salida_label') || 'Salida' 
+        : 'Salida';
+    
     const responsablePlaceholder = (typeof t === 'function') 
         ? t('enter_responsible') || 'Ingresa responsable' 
         : 'Ingresa responsable';
@@ -124,14 +128,18 @@ function generarTareas() {
         ? t('enter_task') || 'Describe la tarea' 
         : 'Describe la tarea';
     
+    const salidaPlaceholder = (typeof t === 'function') 
+        ? t('enter_salida') || 'Describe la salida' 
+        : 'Describe la salida';
+    
     for (let i = 1; i <= 15; i++) {
         const responsable = data[`persona${i}`] || '';
         const tarea = data[`tarea${i}`] || '';
+        const salida = data[`salida${i}`] || '';
 
         const tareaDiv = document.createElement('div');
         tareaDiv.className = 'tarea-row';
         tareaDiv.innerHTML = `
-            <div class="numero">${i}</div>
             <div class="responsable">
                 <label>${responsableLabel}</label>
                 <input type="text" value="${responsable}" 
@@ -143,6 +151,12 @@ function generarTareas() {
                 <input type="text" value="${tarea}" 
                        data-key="tarea${i}" 
                        placeholder="${taskPlaceholder}">
+            </div>
+            <div class="salida">
+                <label>${salidaLabel}</label>
+                <input type="text" value="${salida}" 
+                       data-key="salida${i}" 
+                       placeholder="${salidaPlaceholder}">
             </div>
         `;
         tareasContainer.appendChild(tareaDiv);
