@@ -8,6 +8,67 @@ let langTranslations = null;
 let currentLang = localStorage.getItem('preferredLanguage') || 'es';
 
 // =============================================
+// FUNCIONES AUXILIARES ADAPTATIVAS (NUEVAS - AÑADIR AL PRINCIPIO)
+// =============================================
+
+/**
+ * Obtiene los números de concepto que tienen contenido
+ * @returns {Array} Array con los números de concepto que existen
+ */
+function obtenerConceptosExistentes() {
+    const conceptos = [];
+    for (let conc = 1; conc <= 5; conc++) {
+        const concepto = data[`concepto${conc}`] || '';
+        if (concepto.trim() !== '') {
+            conceptos.push(conc);
+        }
+    }
+    return conceptos;
+}
+
+/**
+ * Genera los grupos de selección dinámicamente basados en conceptos existentes
+ * @returns {Object} Grupos organizados por concepto formado (columna 1-3)
+ */
+function generarGruposDinamicos() {
+    const conceptosExistentes = obtenerConceptosExistentes();
+    const grupos = {
+        col1: [], // Concepto formado 1
+        col2: [], // Concepto formado 2
+        col3: []  // Concepto formado 3
+    };
+    
+    // Para cada concepto existente, generar sus 3 grupos
+    conceptosExistentes.forEach(conc => {
+        const baseGrupo = (conc - 1) * 3;
+        const nombreConcepto = data[`concepto${conc}`] || `${t('idea')} ${conc}`;
+        
+        // Grupo 1 (columna 1)
+        grupos.col1.push({
+            numero: baseGrupo + 1,
+            nombreConcepto: nombreConcepto,
+            seleccion: data[`pastel_grupo${baseGrupo + 1}`] || null
+        });
+        
+        // Grupo 2 (columna 2)
+        grupos.col2.push({
+            numero: baseGrupo + 2,
+            nombreConcepto: nombreConcepto,
+            seleccion: data[`pastel_grupo${baseGrupo + 2}`] || null
+        });
+        
+        // Grupo 3 (columna 3)
+        grupos.col3.push({
+            numero: baseGrupo + 3,
+            nombreConcepto: nombreConcepto,
+            seleccion: data[`pastel_grupo${baseGrupo + 3}`] || null
+        });
+    });
+    
+    return grupos;
+}
+
+// =============================================
 // CARGAR lang.js DINÁMICAMENTE
 // =============================================
 function loadLangJS() {
@@ -347,7 +408,7 @@ function generarPDF() {
 
     y += 10;
 
-    // 3. IDEAS / CONCEPTOS INICIALES
+    // 3. IDEAS / CONCEPTOS INICIALES - MODIFICADO: usar obtenerConceptosExistentes()
     if (y > 250) {
         doc.addPage();
         y = margen;
@@ -359,20 +420,27 @@ function generarPDF() {
     doc.text(t('ideas_concepts'), margen, y);
     y += 15;
 
-    for (let i = 1; i <= 5; i++) {
-        const concepto = data[`concepto${i}`] || `${t('idea')} ${i}`;
-        doc.text(`${i}. ${concepto}`, margen, y);
+    const conceptosExistentes = obtenerConceptosExistentes();
+    
+    if (conceptosExistentes.length === 0) {
+        doc.text(isSpanish ? "No hay conceptos definidos" : "No concepts defined", margen, y);
         y += 10;
+    } else {
+        conceptosExistentes.forEach((conc, index) => {
+            const concepto = data[`concepto${conc}`] || `${t('idea')} ${conc}`;
+            doc.text(`${index + 1}. ${concepto}`, margen, y);
+            y += 10;
 
-        if (y > 280) {
-            doc.addPage();
-            y = margen;
-        }
+            if (y > 280) {
+                doc.addPage();
+                y = margen;
+            }
+        });
     }
 
     y += 10;
 
-    // 4. EVALUACIÓN INICIAL DE IDEAS
+    // 4. EVALUACIÓN INICIAL DE IDEAS - MODIFICADO: usar conceptosExistentes
     if (y > 220) {
         doc.addPage();
         y = margen;
@@ -386,18 +454,17 @@ function generarPDF() {
 
     // Verificar si hay datos de evaluación inicial
     let tieneEvaluacionInicial = false;
-    for (let conc = 1; conc <= 5; conc++) {
+    conceptosExistentes.forEach(conc => {
         for (let i = 1; i <= 4; i++) {
             if (data[`calif${conc}_${i}`]) {
                 tieneEvaluacionInicial = true;
                 break;
             }
         }
-        if (tieneEvaluacionInicial) break;
-    }
+    });
 
     if (tieneEvaluacionInicial) {
-        for (let conc = 1; conc <= 5; conc++) {
+        conceptosExistentes.forEach(conc => {
             if (y > 240) {
                 doc.addPage();
                 y = margen;
@@ -406,7 +473,8 @@ function generarPDF() {
             doc.setFontSize(14);
             doc.setTextColor(13, 71, 161);
             doc.setFont("helvetica", "bold");
-            doc.text(`${t('idea')} ${conc}: ${data[`concepto${conc}`] || `${t('idea')} ${conc}`}`, margen, y);
+            const conceptoNombre = data[`concepto${conc}`] || `${t('idea')} ${conc}`;
+            doc.text(`${t('idea')} ${conc}: ${conceptoNombre}`, margen, y);
             y += 12;
 
             doc.setFontSize(12);
@@ -444,7 +512,7 @@ function generarPDF() {
             }
 
             y += 10;
-        }
+        });
     } else {
         doc.text(t('no_initial_data'), margen, y);
         y += 10;
@@ -452,7 +520,7 @@ function generarPDF() {
 
     y += 10;
 
-    // 5. EXPLORACIÓN DE POSIBILIDADES
+    // 5. EXPLORACIÓN DE POSIBILIDADES - MODIFICADO: usar conceptosExistentes
     if (y > 200) {
         doc.addPage();
         y = margen;
@@ -474,7 +542,7 @@ function generarPDF() {
     }
 
     if (tienePosibilidades) {
-        for (let conc = 1; conc <= 5; conc++) {
+        conceptosExistentes.forEach(conc => {
             if (y > 250) {
                 doc.addPage();
                 y = margen;
@@ -483,7 +551,8 @@ function generarPDF() {
             doc.setFontSize(14);
             doc.setTextColor(13, 71, 161);
             doc.setFont("helvetica", "bold");
-            doc.text(`${t('for')} ${data[`concepto${conc}`] || `${t('idea')} ${conc}`}`, margen, y);
+            const conceptoNombre = data[`concepto${conc}`] || `${t('idea')} ${conc}`;
+            doc.text(`${t('for')} ${conceptoNombre}`, margen, y);
             y += 12;
 
             doc.setFontSize(12);
@@ -506,7 +575,7 @@ function generarPDF() {
             }
 
             y += 10;
-        }
+        });
     } else {
         doc.text(t('no_possibilities_data'), margen, y);
         y += 10;
@@ -514,7 +583,7 @@ function generarPDF() {
 
     y += 10;
 
-    // 6. FORMACIÓN DE CONCEPTOS
+    // 6. FORMACIÓN DE CONCEPTOS - COMPLETAMENTE MODIFICADO: usar grupos dinámicos
     if (y > 200) {
         doc.addPage();
         y = margen;
@@ -531,37 +600,50 @@ function generarPDF() {
     doc.text(t('checkbox_selections'), margen, y);
     y += 10;
 
-    // Verificar si hay selecciones
+    // Generar grupos dinámicamente
+    const grupos = generarGruposDinamicos();
     let tieneSelecciones = false;
-    for (let i = 1; i <= 15; i++) {
-        if (data[`pastel_grupo${i}`]) {
-            tieneSelecciones = true;
-            break;
-        }
-    }
+
+    // Verificar si hay selecciones en cualquier grupo
+    ['col1', 'col2', 'col3'].forEach(col => {
+        grupos[col].forEach(grupo => {
+            if (grupo.seleccion) {
+                tieneSelecciones = true;
+            }
+        });
+    });
 
     if (tieneSelecciones) {
         doc.setFontSize(12);
         doc.setTextColor(0, 0, 0);
-
-        // Mostrar tabla de selecciones
         doc.text(t('selection_summary'), margen, y);
         y += 10;
 
-        for (let i = 1; i <= 15; i++) {
-            const seleccion = data[`pastel_grupo${i}`];
-            if (seleccion) {
-                // Determinar a qué idea original pertenece
-                const ideaOriginal = Math.ceil(i / 3);
-                const nombreIdea = data[`concepto${ideaOriginal}`] || `${t('idea')} ${ideaOriginal}`;
-
-                doc.text(`  ${t('group')} ${i} (${t('from')} ${nombreIdea}): ${seleccion}`, margen + 10, y);
+        // Mostrar selecciones por concepto formado (columna)
+        for (let col = 1; col <= 3; col++) {
+            const gruposCol = col === 1 ? grupos.col1 : col === 2 ? grupos.col2 : grupos.col3;
+            const tieneSeleccionesCol = gruposCol.some(g => g.seleccion);
+            
+            if (tieneSeleccionesCol) {
+                doc.setFont("helvetica", "bold");
+                doc.text(`  ${t('concept_formed')} ${col}:`, margen + 10, y);
                 y += 8;
+                doc.setFont("helvetica", "normal");
+                
+                gruposCol.forEach(grupo => {
+                    if (grupo.seleccion) {
+                        const texto = `    ${grupo.nombreConcepto}: ${grupo.seleccion}`;
+                        doc.text(texto, margen + 20, y);
+                        y += 8;
 
-                if (y > 280) {
-                    doc.addPage();
-                    y = margen;
-                }
+                        if (y > 280) {
+                            doc.addPage();
+                            y = margen;
+                        }
+                    }
+                });
+                
+                y += 5;
             }
         }
     } else {
@@ -571,7 +653,7 @@ function generarPDF() {
 
     y += 15;
 
-    // 7. CONCEPTOS FORMADOS (3 conceptos de 5 ideas)
+    // 7. CONCEPTOS FORMADOS - COMPLETAMENTE MODIFICADO: usar grupos dinámicos
     if (y > 220) {
         doc.addPage();
         y = margen;
@@ -588,16 +670,22 @@ function generarPDF() {
     doc.text(t('concepts_from_selections'), margen, y);
     y += 10;
 
-    // Los 3 conceptos formados
+    // Los 3 conceptos formados usando grupos dinámicos
     const conceptosFormados = [
-        { nombre: t('concept_formed') + " 1", grupos: [1, 4, 7, 10, 13] },
-        { nombre: t('concept_formed') + " 2", grupos: [2, 5, 8, 11, 14] },
-        { nombre: t('concept_formed') + " 3", grupos: [3, 6, 9, 12, 15] }
+        { nombre: t('concept_formed') + " 1", columna: 1, grupos: grupos.col1 },
+        { nombre: t('concept_formed') + " 2", columna: 2, grupos: grupos.col2 },
+        { nombre: t('concept_formed') + " 3", columna: 3, grupos: grupos.col3 }
     ];
 
     let tieneConceptos = false;
 
-    for (const concepto of conceptosFormados) {
+    conceptosFormados.forEach(concepto => {
+        const tieneSelecciones = concepto.grupos.some(g => g.seleccion);
+        
+        if (!tieneSelecciones) return; // Saltar si no hay selecciones
+        
+        tieneConceptos = true;
+        
         if (y > 240) {
             doc.addPage();
             y = margen;
@@ -613,27 +701,23 @@ function generarPDF() {
         doc.setTextColor(0, 0, 0);
         doc.setFont("helvetica", "normal");
 
-        let seleccionesCount = 0;
-
-        // Mostrar las 5 ideas que forman este concepto
-        for (let i = 0; i < concepto.grupos.length; i++) {
-            const grupoKey = `pastel_grupo${concepto.grupos[i]}`;
-            const seleccion = data[grupoKey] || t('no_selection');
-
-            seleccionesCount++;
-            tieneConceptos = true;
-
-            doc.text(`${i + 1}. ${seleccion}`, margen + 10, y);
+        // Mostrar las ideas que forman este concepto
+        concepto.grupos.forEach((grupo, index) => {
+            const texto = grupo.seleccion 
+                ? `${index + 1}. ${grupo.nombreConcepto}: ${grupo.seleccion}`
+                : `${index + 1}. ${grupo.nombreConcepto}: ${t('no_selection')}`;
+            
+            doc.text(texto, margen + 10, y);
             y += 10;
 
             if (y > 280) {
                 doc.addPage();
                 y = margen;
             }
-        }
+        });
 
         y += 10;
-    }
+    });
 
     if (!tieneConceptos) {
         doc.text(t('no_concepts_formed'), margen, y);
@@ -705,7 +789,7 @@ function generarPDF() {
 
     y += 15;
 
-    // 9. MEJOR CONCEPTO SELECCIONADO - COMPLETO
+    // 9. MEJOR CONCEPTO SELECCIONADO - MODIFICADO: usar grupos dinámicos
     if (y > 230) {
         doc.addPage();
         y = margen;
@@ -736,40 +820,35 @@ function generarPDF() {
         doc.text(`${t('score_obtained')}: ${mejorPuntuacion.toFixed(2)}`, margen, y);
         y += 12;
 
-        // MOSTRAR QUÉ FORMA EL MEJOR CONCEPTO
+        // MOSTRAR QUÉ FORMA EL MEJOR CONCEPTO usando grupos dinámicos
         doc.setFontSize(14);
         doc.setTextColor(21, 101, 192);
         doc.setFont("helvetica", "bold");
         doc.text(t('composition_winner'), margen, y);
         y += 12;
 
-        // Determinar qué grupos forman este concepto
-        let gruposDelConcepto = [];
-        if (mejorIndice === 1) {
-            gruposDelConcepto = [1, 4, 7, 10, 13];
-        } else if (mejorIndice === 2) {
-            gruposDelConcepto = [2, 5, 8, 11, 14];
-        } else {
-            gruposDelConcepto = [3, 6, 9, 12, 15];
-        }
+        // Obtener los grupos dinámicos para el mejor concepto
+        const gruposMejorConcepto = mejorIndice === 1 ? grupos.col1 : 
+                                   mejorIndice === 2 ? grupos.col2 : grupos.col3;
 
         doc.setFontSize(12);
         doc.setTextColor(0, 0, 0);
         doc.setFont("helvetica", "normal");
 
-        // Mostrar cada una de las 5 ideas que forman el concepto
-        for (let i = 0; i < gruposDelConcepto.length; i++) {
-            const grupoKey = `pastel_grupo${gruposDelConcepto[i]}`;
-            const seleccion = data[grupoKey] || t('idea_not_selected');
-
+        // Mostrar cada una de las ideas que forman el concepto
+        gruposMejorConcepto.forEach((grupo, index) => {
             if (y > 270) {
                 doc.addPage();
                 y = margen;
             }
 
-            doc.text(`${i + 1}. ${seleccion}`, margen + 10, y);
+            const texto = grupo.seleccion 
+                ? `${index + 1}. ${grupo.nombreConcepto}: ${grupo.seleccion}`
+                : `${index + 1}. ${grupo.nombreConcepto}: ${t('idea_not_selected')}`;
+            
+            doc.text(texto, margen + 10, y);
             y += 10;
-        }
+        });
     } else {
         doc.text(t('no_best_concept'), margen, y);
         y += 10;
@@ -777,7 +856,7 @@ function generarPDF() {
 
     y += 20;
 
-    // 10. PREVENCIÓN DE RIESGOS - COMPLETO
+    // 10. PREVENCIÓN DE RIESGOS - COMPLETO (SIN CAMBIOS)
     if (y > 220) {
         doc.addPage();
         y = margen;
@@ -890,7 +969,7 @@ function generarPDF() {
 
     y += 15;
 
-    // 11. PLAN DE ACCIÓN
+    // 11. PLAN DE ACCIÓN (SIN CAMBIOS)
     if (y > 230) {
         doc.addPage();
         y = margen;
@@ -904,7 +983,7 @@ function generarPDF() {
 
     let tieneTareas = false;
 
-    // Tareas 1-15 - MODIFICADO
+    // Tareas 1-15
     doc.setFontSize(14);
     doc.setTextColor(13, 71, 161);
     doc.setFont("helvetica", "bold");
@@ -914,15 +993,14 @@ function generarPDF() {
     for (let i = 1; i <= 15; i++) {
         const persona = data[`persona${i}`];
         const tarea = data[`tarea${i}`];
-        const salida = data[`salida${i}`]; // NUEVO: Incluir salida
+        const salida = data[`salida${i}`];
 
-        if (persona || tarea || salida) { // MODIFICADO: Incluir salida en la condición
+        if (persona || tarea || salida) {
             tieneTareas = true;
             doc.setFontSize(12);
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "normal");
             
-            // MODIFICADO: Incluir salida en el texto
             const texto = `${i}. ${persona || ""} - ${tarea || ""} - ${salida || ""}`;
             doc.text(texto, margen + 10, y);
             y += 10;
@@ -936,7 +1014,7 @@ function generarPDF() {
 
     y += 15;
 
-    // Tareas 16-30 - MODIFICADO
+    // Tareas 16-30
     if (y > 250) {
         doc.addPage();
         y = margen;
@@ -951,15 +1029,14 @@ function generarPDF() {
     for (let i = 16; i <= 30; i++) {
         const persona = data[`persona${i}`];
         const tarea = data[`tarea${i}`];
-        const salida = data[`salida${i}`]; // NUEVO: Incluir salida
+        const salida = data[`salida${i}`];
 
-        if (persona || tarea || salida) { // MODIFICADO: Incluir salida en la condición
+        if (persona || tarea || salida) {
             tieneTareas = true;
             doc.setFontSize(12);
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "normal");
             
-            // MODIFICADO: Incluir salida en el texto
             const texto = `${i}. ${persona || ""} - ${tarea || ""} - ${salida || ""}`;
             doc.text(texto, margen + 10, y);
             y += 10;

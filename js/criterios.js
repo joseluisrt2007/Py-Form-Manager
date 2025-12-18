@@ -31,7 +31,9 @@ function validateAndEnable() {
     const pesos = Array.from(document.querySelectorAll('.peso')).map(el => parseFloat(el.value) || 0);
     const conceptos = Array.from(document.querySelectorAll('.concepto')).map(el => el.value.trim());
 
-    const allFilled = projectName && criterios.every(c => c) && pesos.every(p => p > 0) && conceptos.every(con => con);
+    // MODIFICADO: Ya no requerimos que TODOS los conceptos estén llenos
+    const criteriosLlenos = criterios.every(c => c);
+    const pesosLlenos = pesos.every(p => p > 0);
     const sumaPesos = pesos.reduce((a, b) => a + b, 0);
 
     const errorEl = document.getElementById('pesoError');
@@ -39,7 +41,11 @@ function validateAndEnable() {
     
     if (!guardarBtn) return; // Botón no encontrado
     
-    if (allFilled && sumaPesos === 10) {
+    // MODIFICADO: Solo requerimos proyecto, criterios, pesos (suma 10), y al menos UN concepto
+    const alMenosUnConcepto = conceptos.some(con => con.trim() !== '');
+    const projectNameValido = projectName !== '';
+    
+    if (projectNameValido && criteriosLlenos && pesosLlenos && sumaPesos === 10 && alMenosUnConcepto) {
         guardarBtn.disabled = false;
         if (errorEl) errorEl.textContent = '';
     } else {
@@ -51,6 +57,30 @@ function validateAndEnable() {
                     ? t('error_sum_weights') || 'La suma de pesos debe ser 10' 
                     : 'La suma de pesos debe ser 10';
                 errorEl.textContent = `${errorMsg} (actual: ${sumaPesos.toFixed(1)})`;
+            } else if (!alMenosUnConcepto) {
+                // Nuevo mensaje de error para conceptos
+                const errorMsg = (typeof t === 'function') 
+                    ? t('error_at_least_one_concept') || 'Ingresa al menos una idea/concepto' 
+                    : 'Ingresa al menos una idea/concepto';
+                errorEl.textContent = errorMsg;
+            } else if (!projectNameValido) {
+                // Mensaje para nombre del proyecto
+                const errorMsg = (typeof t === 'function') 
+                    ? t('error_project_name') || 'Ingresa un nombre para el proyecto' 
+                    : 'Ingresa un nombre para el proyecto';
+                errorEl.textContent = errorMsg;
+            } else if (!criteriosLlenos) {
+                // Mensaje para criterios
+                const errorMsg = (typeof t === 'function') 
+                    ? t('error_all_criteria') || 'Completa todos los criterios' 
+                    : 'Completa todos los criterios';
+                errorEl.textContent = errorMsg;
+            } else if (!pesosLlenos) {
+                // Mensaje para pesos
+                const errorMsg = (typeof t === 'function') 
+                    ? t('error_all_weights') || 'Ingresa un peso para cada criterio' 
+                    : 'Ingresa un peso para cada criterio';
+                errorEl.textContent = errorMsg;
             } else {
                 errorEl.textContent = '';
             }

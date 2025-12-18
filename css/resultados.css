@@ -269,7 +269,7 @@ h1 {
     transform: translateY(-2px);
 }
 
-/* Botón secundario */
+/* Botón secundario - MODIFICADO para que sea igual a gc1.css */
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280, #4b5563);
     color: var(--text-light);
@@ -281,12 +281,22 @@ h1 {
     cursor: pointer;
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.5px;
 }
 
 .btn-secondary:hover {
-    background: linear-gradient(135deg, #4b5563, #374151);
+    /* Solo transformación sin cambio de color, igual que en gc1.css */
     transform: translateY(-6px);
     box-shadow: 0 20px 40px rgba(107, 114, 128, 0.4);
+}
+
+.btn-secondary:focus-visible {
+    outline: 4px solid rgba(107, 114, 128, 0.3);
+    outline-offset: 6px;
+}
+
+.btn-secondary:active {
+    transform: translateY(-2px);
 }
 
 /* ===== FOOTER ===== */
@@ -544,12 +554,15 @@ footer {
     background: linear-gradient(135deg, var(--primary-dark), #1e40af);
 }
 
+/* Botón secundario en tema oscuro - MODIFICADO para que sea igual a gc1.css */
 [data-theme="dark"] .btn-secondary {
     background: linear-gradient(135deg, #4b5563, #374151);
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-    background: linear-gradient(135deg, #374151, #1f2937);
+    /* Solo transformación sin cambio de color, igual que en gc1.css */
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(107, 114, 128, 0.4);
 }
 
 [data-theme="dark"] .theme-toggle {

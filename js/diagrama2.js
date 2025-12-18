@@ -26,6 +26,21 @@ function updateProjectName() {
 }
 
 /**
+ * Obtiene los números de concepto que tienen contenido
+ * @returns {Array} Array con los números de concepto que existen
+ */
+function obtenerConceptosExistentes() {
+    const conceptos = [];
+    for (let conc = 1; conc <= 5; conc++) {
+        const concepto = data[`concepto${conc}`] || '';
+        if (concepto.trim() !== '') {
+            conceptos.push(conc);
+        }
+    }
+    return conceptos;
+}
+
+/**
  * Genera todo el contenido de la página
  */
 function generarContenido() {
@@ -45,6 +60,9 @@ function generarMejorConcepto() {
     let mejorIdx = resultados.indexOf(Math.max(...resultados));
     if (resultados.every(r => r === 0)) mejorIdx = -1;
     
+    // Obtener los conceptos existentes
+    const conceptosExistentes = obtenerConceptosExistentes();
+    
     // Crear el texto del mejor concepto
     let mejorConceptoTexto;
     if (mejorIdx >= 0) {
@@ -58,15 +76,45 @@ function generarMejorConcepto() {
             : 'No se ha seleccionado concepto';
     }
 
-    // Obtener opciones del mejor concepto (misma lógica que diagrama.js)
+    // Obtener opciones del mejor concepto - CORREGIDO para usar solo conceptos existentes
     const opciones = [];
-    if (mejorIdx >= 0) {
-        for (let g = 1; g <= 5; g++) {
-            const key = `pastel_grupo${mejorIdx * 5 + g}`;
+    if (mejorIdx >= 0 && conceptosExistentes.length > 0) {
+        // Para cada concepto existente, necesitamos la opción correspondiente al concepto seleccionado
+        for (const conc of conceptosExistentes) {
+            // La fórmula correcta: (conc-1)*3 + (mejorIdx+1)
+            const key = `pastel_grupo${(conc - 1) * 3 + (mejorIdx + 1)}`;
             const noSelectionText = (typeof t === 'function') 
                 ? t('no_selection') || 'Sin selección' 
                 : 'Sin selección';
-            opciones.push(data[key] || noSelectionText);
+            
+            // Obtener el texto de la opción seleccionada
+            const opcionSeleccionada = data[key] || '';
+            
+            // Obtener el nombre del concepto original
+            const nombreConcepto = data[`concepto${conc}`];
+            
+            // Buscar cuál de las 3 posibilidades fue seleccionada para mostrar mejor
+            let opcionText = '';
+            let encontrado = false;
+            
+            for (let opcionNum = 1; opcionNum <= 3; opcionNum++) {
+                const posIdx = (conc - 1) * 3 + opcionNum;
+                const posibilidad = data[`pos${posIdx}`] || '';
+                
+                if (posibilidad === opcionSeleccionada) {
+                    // Opción encontrada, mostrar concepto y opción
+                    opcionText = `<strong>${nombreConcepto}</strong> ${posibilidad}`;
+                    encontrado = true;
+                    break;
+                }
+            }
+            
+            // Si no se encontró opción seleccionada, mostrar solo el concepto
+            if (!encontrado) {
+                opcionText = `<strong>${nombreConcepto}</strong> <em>${noSelectionText}</em>`;
+            }
+            
+            opciones.push(opcionText);
         }
     }
 
@@ -79,29 +127,31 @@ function generarMejorConcepto() {
         ? t('concept_composition') || 'Composición del concepto' 
         : 'Composición del concepto';
 
-    // Generar HTML (mismo que diagrama.js)
+    // Generar HTML
     mejorConceptoContainer.innerHTML = `
         <div class="mejor-concepto">
-            ${bestConceptText} ${mejorConceptoTexto}
+            ${bestConceptText}: ${mejorConceptoTexto}
         </div>
-        ${mejorIdx >= 0 ? `
+        ${mejorIdx >= 0 && opciones.length > 0 ? `
             <div class="opciones-list">
                 <strong>${compositionText}</strong>
                 <ul>
-                    <li>${opciones[0]}</li>
-                    <li>${opciones[1]}</li>
-                    <li>${opciones[2]}</li>
-                    <li>${opciones[3]}</li>
-                    <li>${opciones[4]}</li>
+                    ${opciones.map(opcion => `<li>${opcion}</li>`).join('')}
                 </ul>
             </div>
         ` : ''}
     `;
+    
+    // Aplicar traducciones a "Sin selección"
+    if (typeof t === 'function') {
+        mejorConceptoContainer.querySelectorAll('em').forEach(em => {
+            if (em.textContent === 'Sin selección') {
+                em.textContent = t('no_selection');
+            }
+        });
+    }
 }
 
-/**
- * Genera las tareas 16 a 30 (continuación de las tareas 1-15)
- */
 /**
  * Genera las tareas 16 a 30 (continuación de las tareas 1-15)
  */
@@ -318,3 +368,4 @@ window.generarMejorConcepto = generarMejorConcepto;
 window.generarTareas = generarTareas;
 window.aplicarTraduccionesEtiquetas = aplicarTraduccionesEtiquetas;
 window.saveAndContinue = saveAndContinue;
+window.obtenerConceptosExistentes = obtenerConceptosExistentes;

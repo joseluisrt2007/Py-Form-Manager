@@ -455,7 +455,7 @@ tr:hover td input {
     transform: translateY(-2px);
 }
 
-/* Botón secundario */
+/* ===== BOTÓN SECUNDARIO (REGRESO) - SIN CAMBIO DE COLOR AL HOVER ===== */
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280, #4b5563);
     color: var(--text-light);
@@ -470,9 +470,18 @@ tr:hover td input {
 }
 
 .btn-secondary:hover {
-    background: linear-gradient(135deg, #4b5563, #374151);
-    transform: translateY(-6px);
-    box-shadow: 0 20px 40px rgba(107, 114, 128, 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
+    /* NO cambiar el color de fondo - igual que en gc1.css */
+}
+
+.btn-secondary:focus-visible {
+    outline: 4px solid rgba(107, 114, 128, 0.3);
+    outline-offset: 4px;
+}
+
+.btn-secondary:active {
+    transform: translateY(-1px);
 }
 
 /* ===== DISEÑO RESPONSIVE ===== */
@@ -859,12 +868,15 @@ tr:hover td input {
     background: linear-gradient(135deg, var(--primary-dark), #1e40af);
 }
 
+/* ===== BOTÓN SECUNDARIO EN TEMA OSCURO - SIN CAMBIO DE COLOR AL HOVER ===== */
 [data-theme="dark"] .btn-secondary {
     background: linear-gradient(135deg, #4b5563, #374151);
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-    background: linear-gradient(135deg, #374151, #1f2937);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
+    /* NO cambiar el color de fondo en modo oscuro tampoco */
 }
 
 [data-theme="dark"] .btn-calc {

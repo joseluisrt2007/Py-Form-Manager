@@ -404,9 +404,17 @@ input[type="checkbox"]:focus-visible {
 }
 
 .btn-secondary:hover {
-    background: linear-gradient(135deg, #4b5563, #374151);
     transform: translateY(-4px);
     box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
+}
+
+.btn-secondary:focus-visible {
+    outline: 4px solid rgba(107, 114, 128, 0.3);
+    outline-offset: 4px;
+}
+
+.btn-secondary:active {
+    transform: translateY(-1px);
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
@@ -755,5 +763,6 @@ input[type="checkbox"]:focus-visible {
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-    background: linear-gradient(135deg, #374151, #1f2937);
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px rgba(107, 114, 128, 0.25);
 }

@@ -24,8 +24,14 @@ const translations = {
         'error_ratings_range': 'Las calificaciones deben estar entre 0 y 10.',
         'error_severity_occurrence': 'Severidad y Ocurrencia deben ser números enteros entre 1 y 10.',
         
+        // NUEVOS ERRORES PARA CRITERIOS.HTML
+        'error_at_least_one_concept': 'Ingresa al menos una idea/concepto',
+        'error_project_name': 'Ingresa un nombre para el proyecto',
+        'error_all_criteria': 'Completa todos los criterios',
+        'error_all_weights': 'Ingresa un peso para cada criterio',
+        
         // =================== PÁGINAS ===================
-        'criteria_weights': 'Criterios y pesos (la suma debe ser 10)',
+        'criteria_weights': 'Criterios y pesos',
         'ideas_concepts': 'Ideas',
         'concept_evaluation': 'Evaluación',
         'explore_possibilities': 'Exploración de Posibilidades',
@@ -46,7 +52,7 @@ const translations = {
         'tasks_responsibles': 'Tabla de tareas y responsables',
         
         // =================== CONCEPTOS ===================
-        'best_concept': 'Mejor Concepto:',
+        'best_concept': 'Mejor Concepto',
         'no_concept_selected': 'Ninguno seleccionado',
         'concept_composition': 'Opciones que componen este concepto:',
         'concept_formed': 'Concepto Formado',
@@ -143,8 +149,14 @@ const translations = {
         'error_ratings_range': 'Ratings must be between 0 and 10.',
         'error_severity_occurrence': 'Severity and Occurrence must be integers between 1 and 10.',
         
+        // NUEVOS ERRORES PARA CRITERIOS.HTML
+        'error_at_least_one_concept': 'Enter at least one idea/concept',
+        'error_project_name': 'Enter a project name',
+        'error_all_criteria': 'Complete all criteria',
+        'error_all_weights': 'Enter a weight for each criteria',
+        
         // =================== PAGES ===================
-        'criteria_weights': 'Criteria and weights (sum must be 10)',
+        'criteria_weights': 'Criteria and weights',
         'ideas_concepts': 'Ideas',
         'concept_evaluation': 'Evaluation',
         'explore_possibilities': 'Explore Possibilities',
@@ -165,7 +177,7 @@ const translations = {
         'tasks_responsibles': 'Table of tasks and responsibles',
         
         // =================== CONCEPTS ===================
-        'best_concept': 'Best Concept:',
+        'best_concept': 'Best Concept',
         'no_concept_selected': 'None selected',
         'concept_composition': 'Options that form this concept:',
         'concept_formed': 'Concept Formed',

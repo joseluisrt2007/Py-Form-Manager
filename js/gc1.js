@@ -25,15 +25,46 @@ function updateProjectName() {
 }
 
 /**
- * Genera las 5 tablas de formación de conceptos (una por concepto)
+ * Cuenta cuántos conceptos tienen contenido
+ * @returns {number} Número de conceptos con contenido
+ */
+function contarConceptos() {
+    let contador = 0;
+    for (let conc = 1; conc <= 5; conc++) {
+        const concepto = data[`concepto${conc}`] || '';
+        if (concepto.trim() !== '') {
+            contador++;
+        }
+    }
+    return contador;
+}
+
+/**
+ * Genera las tablas de formación de conceptos (solo para conceptos con contenido)
  */
 function generarTablas() {
     if (!tablasContainer) return;
     
     tablasContainer.innerHTML = '';
     
+    const numeroDeConceptos = contarConceptos();
+    
+    // Si no hay conceptos, mostrar mensaje
+    if (numeroDeConceptos === 0) {
+        const message = document.createElement('div');
+        message.className = 'no-conceptos-message';
+        message.textContent = 'No hay conceptos definidos. Regresa a la página anterior para ingresar conceptos.';
+        tablasContainer.appendChild(message);
+        return;
+    }
+    
     for (let conc = 1; conc <= 5; conc++) {
-        const conceptoNombre = data[`concepto${conc}`] || `Concepto ${conc}`;
+        const conceptoNombre = data[`concepto${conc}`] || '';
+        
+        // Solo crear tabla si el concepto tiene contenido
+        if (conceptoNombre.trim() === '') {
+            continue;
+        }
         
         const section = document.createElement('div');
         section.className = 'concepto-section';
@@ -284,3 +315,4 @@ window.updateProjectName = updateProjectName;
 window.generarTablas = generarTablas;
 window.configurarCheckboxes = configurarCheckboxes;
 window.saveAndContinue = saveAndContinue;
+window.contarConceptos = contarConceptos;

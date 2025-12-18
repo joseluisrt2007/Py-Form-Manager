@@ -264,10 +264,29 @@ td input:focus {
 
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: var(--text-light);
+    padding: 1rem 2.5rem;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-secondary:hover {
-    background: linear-gradient(135deg, #4b5563, #374151);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(107, 114, 128, 0.35);
+}
+
+.btn-secondary:focus-visible {
+    outline: 4px solid rgba(107, 114, 128, 0.5);
+    outline-offset: 6px;
+}
+
+.btn-secondary:active {
+    transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {
@@ -326,6 +345,11 @@ td input:focus {
     }
 
     .btn-primary {
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .btn-secondary {
         width: 100%;
         max-width: 400px;
     }
@@ -509,7 +533,8 @@ td input:focus {
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-    background: linear-gradient(135deg, #374151, #1f2937);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(107, 114, 128, 0.35);
 }
 
 /* ========== RESPONSIVE ========== */

@@ -27,6 +27,66 @@ function updateProjectName() {
 }
 
 /**
+ * Obtiene los números de concepto que tienen contenido
+ * @returns {Array} Array con los números de concepto que existen
+ */
+function obtenerConceptosExistentes() {
+    const conceptos = [];
+    for (let conc = 1; conc <= 5; conc++) {
+        const concepto = data[`concepto${conc}`] || '';
+        if (concepto.trim() !== '') {
+            conceptos.push(conc);
+        }
+    }
+    return conceptos;
+}
+
+/**
+ * Obtiene las opciones que conforman un concepto formado
+ * @param {number} col - Número de la columna (1-3)
+ * @returns {Array} Array de opciones seleccionadas con sus nombres de concepto
+ */
+function obtenerOpcionesConcepto(col) {
+    const conceptosExistentes = obtenerConceptosExistentes();
+    const opciones = [];
+    
+    for (const conc of conceptosExistentes) {
+        // Obtener el nombre del concepto original
+        const nombreConcepto = data[`concepto${conc}`];
+        
+        // Obtener la selección para esta columna
+        const grupoKey = `pastel_grupo${(conc - 1) * 3 + col}`;
+        const opcionSeleccionada = data[grupoKey] || '';
+        
+        // Obtener el número de la opción (1, 2 o 3) y su texto completo
+        let opcionText = '';
+        let encontrado = false;
+        
+        // Buscar cuál de las 3 posibilidades fue seleccionada
+        for (let opcionNum = 1; opcionNum <= 3; opcionNum++) {
+            const posIdx = (conc - 1) * 3 + opcionNum;
+            const posibilidad = data[`pos${posIdx}`] || '';
+            
+            if (posibilidad === opcionSeleccionada) {
+                // Opción encontrada, mostrar concepto y opción
+                opcionText = `<strong>${nombreConcepto}</strong> ${posibilidad}`;
+                encontrado = true;
+                break;
+            }
+        }
+        
+        // Si no se encontró opción seleccionada, mostrar solo el concepto
+        if (!encontrado) {
+            opcionText = `<strong>${nombreConcepto}</strong> <em>${typeof t === 'function' ? t('no_selection') : 'Sin selección'}</em>`;
+        }
+        
+        opciones.push(opcionText);
+    }
+    
+    return opciones;
+}
+
+/**
  * Genera las 3 tablas de evaluación de conceptos formados
  */
 function generarTablas() {
@@ -34,34 +94,38 @@ function generarTablas() {
     
     tablasContainer.innerHTML = '';
     
-    for (let conc = 1; conc <= 3; conc++) {
+    const conceptosExistentes = obtenerConceptosExistentes();
+    
+    // Si no hay conceptos originales, mostrar mensaje
+    if (conceptosExistentes.length === 0) {
+        const message = document.createElement('div');
+        message.className = 'no-conceptos-message';
+        message.textContent = 'No hay conceptos definidos. Regresa a la página anterior para ingresar conceptos.';
+        tablasContainer.appendChild(message);
+        return;
+    }
+    
+    // Siempre hay 3 conceptos formados (uno por columna del pastel)
+    for (let col = 1; col <= 3; col++) {
         const section = document.createElement('div');
         section.className = 'concepto-section';
 
-        // Obtener las 5 opciones del concepto formado
-        const indices = [];
-        for (let g = 1; g <= 5; g++) {
-            const grupoKey = `pastel_grupo${(g - 1) * 3 + conc}`;
-            const selectedPos = data[grupoKey] || (typeof t === 'function' ? t('no_selection') : 'Sin selección');
-            indices.push(selectedPos);
-        }
+        // Obtener las opciones del concepto formado
+        const opciones = obtenerOpcionesConcepto(col);
 
         // Obtener texto traducido para el título
         const titleText = (typeof t === 'function') 
-            ? `${t('concept_formed') || 'Concepto formado'} ${conc}` 
-            : `Concepto formado ${conc}`;
+            ? `${t('concept_formed') || 'Concepto formado'} ${col}` 
+            : `Concepto formado ${col}`;
+        
+        // Generar lista de opciones
+        const opcionesHTML = opciones.map(opcion => `<li>${opcion}</li>`).join('');
         
         section.innerHTML = `
             <div class="concepto-title">${titleText}</div>
             <div class="opciones-list">
                 <strong data-i18n="options_forming_concept">Opciones que componen este concepto:</strong>
-                <ul>
-                    <li>${indices[0]}</li>
-                    <li>${indices[1]}</li>
-                    <li>${indices[2]}</li>
-                    <li>${indices[3]}</li>
-                    <li>${indices[4]}</li>
-                </ul>
+                <ul>${opcionesHTML}</ul>
             </div>
             <table>
                 <thead>
@@ -74,7 +138,7 @@ function generarTablas() {
                 </thead>
                 <tbody>
                     ${[1, 2, 3, 4].map(i => {
-                        const dataKey = `ca${(conc - 1) * 4 + i}`;
+                        const dataKey = `ca${(col - 1) * 4 + i}`;
                         const savedValue = data[dataKey] || '';
                         const criterioText = data[`criterio${i}`] || 
                             ((typeof t === 'function') ? `${t('criteria') || 'Criterio'} ${i}` : `Criterio ${i}`);
@@ -88,17 +152,17 @@ function generarTablas() {
                                 <td>${i}</td>
                                 <td>${criterioText}</td>
                                 <td>
-                                    <input type="number" class="calif" data-conc="${conc}" data-crit="${i}" 
+                                    <input type="number" class="calif" data-conc="${col}" data-crit="${i}" 
                                            min="0" max="10" step="0.1" value="${savedValue}" 
                                            placeholder="${placeholderText}" data-i18n-placeholder="enter_rating">
                                 </td>
-                                <td>${i === 1 ? `<span class="resultado" id="res${conc}">0.00</span>` : ''}</td>
+                                <td>${i === 1 ? `<span class="resultado" id="res${col}">0.00</span>` : ''}</td>
                             </tr>
                         `;
                     }).join('')}
                 </tbody>
             </table>
-            <button class="btn-calc" onclick="calcular(${conc})" data-i18n="calculate">Calcular</button>
+            <button class="btn-calc" onclick="calcular(${col})" data-i18n="calculate">Calcular</button>
         `;
         tablasContainer.appendChild(section);
     }
@@ -161,9 +225,9 @@ function aplicarTraduccionesCompletas() {
     });
     
     // Actualizar textos "Sin selección" en las listas
-    document.querySelectorAll('.opciones-list li').forEach(li => {
-        if (typeof t === 'function' && li.textContent === t('no_selection')) {
-            li.textContent = t('no_selection');
+    document.querySelectorAll('.opciones-list li em').forEach(em => {
+        if (typeof t === 'function' && em.textContent === 'Sin selección') {
+            em.textContent = t('no_selection');
         }
     });
 }
@@ -179,7 +243,7 @@ function alertT(key) {
 
 /**
  * Calcula el resultado de un concepto específico
- * @param {number} conc - Número del concepto (1-3)
+ * @param {number} conc - Número del concepto formado (1-3)
  */
 function calcular(conc) {
     let total = 0;
@@ -391,3 +455,5 @@ window.calcular = calcular;
 window.recalcularTodo = recalcularTodo;
 window.validateAll = validateAll;
 window.saveAndContinue = saveAndContinue;
+window.obtenerConceptosExistentes = obtenerConceptosExistentes;
+window.obtenerOpcionesConcepto = obtenerOpcionesConcepto;
