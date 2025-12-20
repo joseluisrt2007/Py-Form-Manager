@@ -82,7 +82,7 @@ function generarTablas() {
                     </tr>
                 </thead>
                 <tbody>
-                    ${[1, 2, 3, 4].map(i => `
+                    ${[1, 2, 3, 4, 5].map(i => `  <!-- CAMBIADO: Ahora incluye el 5 -->
                         <tr>
                             <td>${i}</td>
                             <td>${data[`criterio${i}`] || `Criterio ${i}`}</td>
@@ -144,7 +144,7 @@ function calcular(conc) {
     let total = 0;
     let valid = true;
     
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 5; i++) {  // CAMBIADO: Ahora incluye el 5
         const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
         if (!input) continue;
         
@@ -188,7 +188,7 @@ function recalcularTodo() {
         
         let hasData = false;
         
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= 5; i++) {  // CAMBIADO: Ahora incluye el 5
             const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
             if (input && input.value !== '') {
                 hasData = true;

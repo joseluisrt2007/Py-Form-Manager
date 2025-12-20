@@ -8,7 +8,15 @@ let langTranslations = null;
 let currentLang = localStorage.getItem('preferredLanguage') || 'es';
 
 // =============================================
-// FUNCIONES AUXILIARES ADAPTATIVAS (NUEVAS - AÑADIR AL PRINCIPIO)
+// CONSTANTES DE CONFIGURACIÓN
+// =============================================
+const NUM_CRITERIOS = 5; // CAMBIADO DE 4 A 5
+const NUM_CONCEPTOS_MAX = 5;
+const NUM_CONCEPTOS_FORMADOS = 3;
+const NUM_OPCIONES_POR_CONCEPTO = 3;
+
+// =============================================
+// FUNCIONES AUXILIARES ADAPTATIVAS
 // =============================================
 
 /**
@@ -17,7 +25,7 @@ let currentLang = localStorage.getItem('preferredLanguage') || 'es';
  */
 function obtenerConceptosExistentes() {
     const conceptos = [];
-    for (let conc = 1; conc <= 5; conc++) {
+    for (let conc = 1; conc <= NUM_CONCEPTOS_MAX; conc++) {
         const concepto = data[`concepto${conc}`] || '';
         if (concepto.trim() !== '') {
             conceptos.push(conc);
@@ -40,7 +48,7 @@ function generarGruposDinamicos() {
     
     // Para cada concepto existente, generar sus 3 grupos
     conceptosExistentes.forEach(conc => {
-        const baseGrupo = (conc - 1) * 3;
+        const baseGrupo = (conc - 1) * NUM_OPCIONES_POR_CONCEPTO;
         const nombreConcepto = data[`concepto${conc}`] || `${t('idea')} ${conc}`;
         
         // Grupo 1 (columna 1)
@@ -142,9 +150,9 @@ function t(key) {
             'no_concepts_formed': 'No se han formado conceptos',
             'evaluation_concepts_formed': '7. EVALUACIÓN DE CONCEPTOS FORMADOS',
             'no_evaluation_concepts': 'No hay evaluación de conceptos formados',
-            'final_score': 'Puntuación final:',
+            'final_score': 'Puntuación final',
             'best_concept_selected': '8. MEJOR CONCEPTO SELECCIONADO',
-            'score_obtained': 'Puntuación obtenida:',
+            'score_obtained': 'Puntuación obtenida',
             'composition_winner': 'COMPOSICIÓN DEL CONCEPTO GANADOR:',
             'idea_not_selected': '(Idea no seleccionada)',
             'no_best_concept': 'No hay concepto evaluado como mejor',
@@ -198,9 +206,9 @@ function t(key) {
             'no_concepts_formed': 'No concepts have been formed',
             'evaluation_concepts_formed': '7. EVALUATION OF FORMED CONCEPTS',
             'no_evaluation_concepts': 'No evaluation of formed concepts',
-            'final_score': 'Final score:',
+            'final_score': 'Final score',
             'best_concept_selected': '8. BEST CONCEPT SELECTED',
-            'score_obtained': 'Score obtained:',
+            'score_obtained': 'Score obtained',
             'composition_winner': 'COMPOSITION OF THE WINNING CONCEPT:',
             'idea_not_selected': '(Idea not selected)',
             'no_best_concept': 'No concept evaluated as best',
@@ -264,6 +272,39 @@ function tInterface(key) {
 }
 
 // =============================================
+// FUNCIONES AUXILIARES PARA VERIFICACIÓN DE DATOS
+// =============================================
+
+/**
+ * Verifica si un concepto original tiene datos de evaluación
+ * @param {number} conc - Número del concepto (1-5)
+ * @returns {boolean} true si tiene datos
+ */
+function tieneDatosEvaluacionOriginal(conc) {
+    for (let i = 1; i <= NUM_CRITERIOS; i++) {
+        if (data[`calif${conc}_${i}`]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Verifica si un concepto formado tiene datos de evaluación
+ * @param {number} conc - Número del concepto formado (1-3)
+ * @returns {boolean} true si tiene datos
+ */
+function tieneDatosEvaluacionFormado(conc) {
+    for (let i = 1; i <= NUM_CRITERIOS; i++) {
+        const key = `ca${(conc - 1) * NUM_CRITERIOS + i}`;
+        if (data[key]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// =============================================
 // ACTUALIZAR INTERFAZ DE USUARIO
 // =============================================
 function updateInterface() {
@@ -301,7 +342,7 @@ function updateInterface() {
 }
 
 // =============================================
-// FUNCIONES AUXILIARES
+// FUNCIONES AUXILIARES DE INTERFAZ
 // =============================================
 
 // Actualizar nombre del proyecto en navbar
@@ -333,7 +374,7 @@ function updateThemeButton() {
 }
 
 // =============================================
-// FUNCIÓN PRINCIPAL GENERAR PDF
+// FUNCIÓN PRINCIPAL GENERAR PDF (COMPLETAMENTE CORREGIDA)
 // =============================================
 function generarPDF() {
     // Verificar si jsPDF está disponible
@@ -374,7 +415,7 @@ function generarPDF() {
     doc.addPage();
     y = margen;
 
-    // 2. CRITERIOS Y PESOS
+    // 2. CRITERIOS Y PESOS - CORREGIDO: 5 CRITERIOS
     doc.setFontSize(16);
     doc.setTextColor(21, 101, 192);
     doc.setFont("helvetica", "bold");
@@ -386,7 +427,8 @@ function generarPDF() {
     doc.setFont("helvetica", "normal");
 
     let sumaPesos = 0;
-    for (let i = 1; i <= 4; i++) {
+    // CAMBIADO: Ahora muestra 5 criterios
+    for (let i = 1; i <= NUM_CRITERIOS; i++) {
         const criterio = data[`criterio${i}`] || `${t('criteria')} ${i}`;
         const peso = parseFloat(data[`peso${i}`]) || 0;
         sumaPesos += peso;
@@ -408,7 +450,7 @@ function generarPDF() {
 
     y += 10;
 
-    // 3. IDEAS / CONCEPTOS INICIALES - MODIFICADO: usar obtenerConceptosExistentes()
+    // 3. IDEAS / CONCEPTOS INICIALES
     if (y > 250) {
         doc.addPage();
         y = margen;
@@ -440,7 +482,7 @@ function generarPDF() {
 
     y += 10;
 
-    // 4. EVALUACIÓN INICIAL DE IDEAS - MODIFICADO: usar conceptosExistentes
+    // 4. EVALUACIÓN INICIAL DE IDEAS - CORREGIDO: 5 CRITERIOS
     if (y > 220) {
         doc.addPage();
         y = margen;
@@ -452,14 +494,11 @@ function generarPDF() {
     doc.text(t('initial_evaluation'), margen, y);
     y += 15;
 
-    // Verificar si hay datos de evaluación inicial
+    // Verificar si hay datos de evaluación inicial (CORREGIDO: usa 5 criterios)
     let tieneEvaluacionInicial = false;
     conceptosExistentes.forEach(conc => {
-        for (let i = 1; i <= 4; i++) {
-            if (data[`calif${conc}_${i}`]) {
-                tieneEvaluacionInicial = true;
-                break;
-            }
+        if (tieneDatosEvaluacionOriginal(conc)) {
+            tieneEvaluacionInicial = true;
         }
     });
 
@@ -469,6 +508,9 @@ function generarPDF() {
                 doc.addPage();
                 y = margen;
             }
+
+            // Solo mostrar si tiene datos
+            if (!tieneDatosEvaluacionOriginal(conc)) return;
 
             doc.setFontSize(14);
             doc.setTextColor(13, 71, 161);
@@ -482,14 +524,13 @@ function generarPDF() {
             doc.setFont("helvetica", "normal");
 
             let total = 0;
-            let tieneDatos = false;
 
-            for (let i = 1; i <= 4; i++) {
+            // CORREGIDO: Ahora calcula con 5 criterios
+            for (let i = 1; i <= NUM_CRITERIOS; i++) {
                 const calif = parseFloat(data[`calif${conc}_${i}`]) || 0;
                 const peso = parseFloat(data[`peso${i}`]) || 0;
 
                 if (data[`calif${conc}_${i}`]) {
-                    tieneDatos = true;
                     const ponderado = calif * peso;
                     total += ponderado;
 
@@ -504,12 +545,10 @@ function generarPDF() {
                 }
             }
 
-            if (tieneDatos) {
-                doc.setFont("helvetica", "bold");
-                doc.text(`  TOTAL: ${total.toFixed(2)}`, margen + 10, y);
-                doc.setFont("helvetica", "normal");
-                y += 12;
-            }
+            doc.setFont("helvetica", "bold");
+            doc.text(`  TOTAL: ${total.toFixed(2)}`, margen + 10, y);
+            doc.setFont("helvetica", "normal");
+            y += 12;
 
             y += 10;
         });
@@ -520,7 +559,7 @@ function generarPDF() {
 
     y += 10;
 
-    // 5. EXPLORACIÓN DE POSIBILIDADES - MODIFICADO: usar conceptosExistentes
+    // 5. EXPLORACIÓN DE POSIBILIDADES
     if (y > 200) {
         doc.addPage();
         y = margen;
@@ -534,7 +573,8 @@ function generarPDF() {
 
     // Verificar si hay datos de posibilidades
     let tienePosibilidades = false;
-    for (let i = 1; i <= 15; i++) {
+    // Verificar todas las posibilidades posibles (máximo 15 = 5 conceptos × 3 opciones)
+    for (let i = 1; i <= (NUM_CONCEPTOS_MAX * NUM_OPCIONES_POR_CONCEPTO); i++) {
         if (data[`pos${i}`]) {
             tienePosibilidades = true;
             break;
@@ -559,8 +599,8 @@ function generarPDF() {
             doc.setTextColor(0, 0, 0);
             doc.setFont("helvetica", "normal");
 
-            for (let row = 1; row <= 3; row++) {
-                const posIdx = (conc - 1) * 3 + row;
+            for (let row = 1; row <= NUM_OPCIONES_POR_CONCEPTO; row++) {
+                const posIdx = (conc - 1) * NUM_OPCIONES_POR_CONCEPTO + row;
                 const posibilidad = data[`pos${posIdx}`] || "";
 
                 if (posibilidad) {
@@ -583,7 +623,7 @@ function generarPDF() {
 
     y += 10;
 
-    // 6. FORMACIÓN DE CONCEPTOS - COMPLETAMENTE MODIFICADO: usar grupos dinámicos
+    // 6. FORMACIÓN DE CONCEPTOS
     if (y > 200) {
         doc.addPage();
         y = margen;
@@ -620,7 +660,7 @@ function generarPDF() {
         y += 10;
 
         // Mostrar selecciones por concepto formado (columna)
-        for (let col = 1; col <= 3; col++) {
+        for (let col = 1; col <= NUM_CONCEPTOS_FORMADOS; col++) {
             const gruposCol = col === 1 ? grupos.col1 : col === 2 ? grupos.col2 : grupos.col3;
             const tieneSeleccionesCol = gruposCol.some(g => g.seleccion);
             
@@ -653,7 +693,7 @@ function generarPDF() {
 
     y += 15;
 
-    // 7. CONCEPTOS FORMADOS - COMPLETAMENTE MODIFICADO: usar grupos dinámicos
+    // 7. CONCEPTOS FORMADOS
     if (y > 220) {
         doc.addPage();
         y = margen;
@@ -726,7 +766,7 @@ function generarPDF() {
 
     y += 15;
 
-    // 8. EVALUACIÓN DE CONCEPTOS FORMADOS
+    // 8. EVALUACIÓN DE CONCEPTOS FORMADOS - CORREGIDO: 5 CRITERIOS
     if (y > 220) {
         doc.addPage();
         y = margen;
@@ -740,46 +780,41 @@ function generarPDF() {
 
     let tieneEvalConceptos = false;
 
-    for (let conc = 1; conc <= 3; conc++) {
-        let tieneDatos = false;
-        for (let i = 1; i <= 4; i++) {
-            const key = `ca${(conc - 1) * 4 + i}`;
-            if (data[key]) {
-                tieneDatos = true;
-                tieneEvalConceptos = true;
-                break;
-            }
+    for (let conc = 1; conc <= NUM_CONCEPTOS_FORMADOS; conc++) {
+        if (!tieneDatosEvaluacionFormado(conc)) continue;
+        
+        tieneEvalConceptos = true;
+
+        if (y > 260) {
+            doc.addPage();
+            y = margen;
         }
 
-        if (tieneDatos) {
-            if (y > 260) {
-                doc.addPage();
-                y = margen;
-            }
+        doc.setFontSize(14);
+        doc.setTextColor(13, 71, 161);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${t('concept_formed')} ${conc}`, margen, y);
+        y += 12;
 
-            doc.setFontSize(14);
-            doc.setTextColor(13, 71, 161);
-            doc.setFont("helvetica", "bold");
-            doc.text(`${t('concept_formed')} ${conc}`, margen, y);
-            y += 12;
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont("helvetica", "normal");
 
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            doc.setFont("helvetica", "normal");
-
-            let total = 0;
-            for (let i = 1; i <= 4; i++) {
-                const key = `ca${(conc - 1) * 4 + i}`;
-                const calif = parseFloat(data[key]) || 0;
-                const peso = parseFloat(data[`peso${i}`]) || 0;
-                total += calif * peso;
-            }
-
-            doc.text(`${t('final_score')}: ${total.toFixed(2)}`, margen + 10, y);
-            y += 12;
-
-            data[`resultado${conc + 3}`] = total.toFixed(2);
+        let total = 0;
+        // CORREGIDO: Ahora calcula con 5 criterios
+        for (let i = 1; i <= NUM_CRITERIOS; i++) {
+            // Fórmula CORREGIDA para 5 criterios: ca1-ca5, ca6-ca10, ca11-ca15
+            const key = `ca${(conc - 1) * NUM_CRITERIOS + i}`;
+            const calif = parseFloat(data[key]) || 0;
+            const peso = parseFloat(data[`peso${i}`]) || 0;
+            total += calif * peso;
         }
+
+        doc.text(`${t('final_score')}: ${total.toFixed(2)}`, margen + 10, y);
+        y += 12;
+
+        // Guardar resultado (para concepto formado 1-3)
+        data[`resultado${conc + 3}`] = total.toFixed(2);
     }
 
     if (!tieneEvalConceptos) {
@@ -789,7 +824,7 @@ function generarPDF() {
 
     y += 15;
 
-    // 9. MEJOR CONCEPTO SELECCIONADO - MODIFICADO: usar grupos dinámicos
+    // 9. MEJOR CONCEPTO SELECCIONADO
     if (y > 230) {
         doc.addPage();
         y = margen;
@@ -801,7 +836,7 @@ function generarPDF() {
     doc.text(t('best_concept_selected'), margen, y);
     y += 15;
 
-    // Buscar el mejor concepto
+    // Buscar el mejor concepto formado (resultado4, resultado5, resultado6)
     let mejorIndice = -1;
     let mejorPuntuacion = -1;
 
@@ -809,7 +844,7 @@ function generarPDF() {
         const puntuacion = parseFloat(data[`resultado${i}`]) || 0;
         if (puntuacion > mejorPuntuacion) {
             mejorPuntuacion = puntuacion;
-            mejorIndice = i - 3;
+            mejorIndice = i - 3; // Convertir a índice 1-3
         }
     }
 
@@ -856,7 +891,7 @@ function generarPDF() {
 
     y += 20;
 
-    // 10. PREVENCIÓN DE RIESGOS - COMPLETO (SIN CAMBIOS)
+    // 10. PREVENCIÓN DE RIESGOS
     if (y > 220) {
         doc.addPage();
         y = margen;
@@ -969,7 +1004,7 @@ function generarPDF() {
 
     y += 15;
 
-    // 11. PLAN DE ACCIÓN (SIN CAMBIOS)
+    // 11. PLAN DE ACCIÓN
     if (y > 230) {
         doc.addPage();
         y = margen;
@@ -1180,3 +1215,10 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('error', function(event) {
     console.error('Error global capturado:', event.error);
 });
+
+// =============================================
+// EXPORTAR FUNCIONES PARA USO GLOBAL
+// =============================================
+window.generarPDF = generarPDF;
+window.obtenerConceptosExistentes = obtenerConceptosExistentes;
+window.generarGruposDinamicos = generarGruposDinamicos;

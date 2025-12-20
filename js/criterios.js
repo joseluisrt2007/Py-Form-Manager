@@ -1,5 +1,6 @@
 // ========== VARIABLES GLOBALES ==========
 const data = JSON.parse(localStorage.getItem('projectData') || '{}');
+const NUM_CRITERIOS = 5; // Cambiado de 4 a 5
 
 // ========== FUNCIONES PRINCIPALES ==========
 
@@ -31,10 +32,10 @@ function validateAndEnable() {
     const pesos = Array.from(document.querySelectorAll('.peso')).map(el => parseFloat(el.value) || 0);
     const conceptos = Array.from(document.querySelectorAll('.concepto')).map(el => el.value.trim());
 
-    // MODIFICADO: Ya no requerimos que TODOS los conceptos estén llenos
-    const criteriosLlenos = criterios.every(c => c);
-    const pesosLlenos = pesos.every(p => p > 0);
-    const sumaPesos = pesos.reduce((a, b) => a + b, 0);
+    // MODIFICADO: Solo considerar los primeros NUM_CRITERIOS (5) criterios
+    const criteriosLlenos = criterios.slice(0, NUM_CRITERIOS).every(c => c);
+    const pesosLlenos = pesos.slice(0, NUM_CRITERIOS).every(p => p > 0);
+    const sumaPesos = pesos.slice(0, NUM_CRITERIOS).reduce((a, b) => a + b, 0);
 
     const errorEl = document.getElementById('pesoError');
     const guardarBtn = document.getElementById('guardarBtn');
@@ -70,16 +71,16 @@ function validateAndEnable() {
                     : 'Ingresa un nombre para el proyecto';
                 errorEl.textContent = errorMsg;
             } else if (!criteriosLlenos) {
-                // Mensaje para criterios
+                // Mensaje para criterios (ahora 5)
                 const errorMsg = (typeof t === 'function') 
-                    ? t('error_all_criteria') || 'Completa todos los criterios' 
-                    : 'Completa todos los criterios';
+                    ? t('error_all_criteria') || `Completa todos los ${NUM_CRITERIOS} criterios` 
+                    : `Completa todos los ${NUM_CRITERIOS} criterios`;
                 errorEl.textContent = errorMsg;
             } else if (!pesosLlenos) {
-                // Mensaje para pesos
+                // Mensaje para pesos (ahora 5)
                 const errorMsg = (typeof t === 'function') 
-                    ? t('error_all_weights') || 'Ingresa un peso para cada criterio' 
-                    : 'Ingresa un peso para cada criterio';
+                    ? t('error_all_weights') || `Ingresa un peso para cada uno de los ${NUM_CRITERIOS} criterios` 
+                    : `Ingresa un peso para cada uno de los ${NUM_CRITERIOS} criterios`;
                 errorEl.textContent = errorMsg;
             } else {
                 errorEl.textContent = '';
@@ -94,13 +95,20 @@ function validateAndEnable() {
 function saveAndContinue() {
     // Guardar datos en el objeto data
     data.projectName = document.getElementById('projectName').value.trim();
+    data.numCriterios = NUM_CRITERIOS; // Guardar el número de criterios
     
     document.querySelectorAll('.criterio').forEach(el => {
-        data[`criterio${el.dataset.id}`] = el.value.trim();
+        const id = el.dataset.id;
+        if (id && parseInt(id) <= NUM_CRITERIOS) {
+            data[`criterio${id}`] = el.value.trim();
+        }
     });
     
     document.querySelectorAll('.peso').forEach(el => {
-        data[`peso${el.dataset.id}`] = el.value;
+        const id = el.dataset.id;
+        if (id && parseInt(id) <= NUM_CRITERIOS) {
+            data[`peso${id}`] = el.value;
+        }
     });
     
     document.querySelectorAll('.concepto').forEach(el => {
@@ -207,22 +215,43 @@ function setupSaveButton() {
 }
 
 /**
+ * Migra datos antiguos (4 criterios) al nuevo formato (5 criterios)
+ */
+function migrateOldData() {
+    // Si ya tenemos datos pero no el 5to criterio, inicializarlo vacío
+    if (data.criterio4 && !data.criterio5) {
+        data.criterio5 = '';
+        data.peso5 = '';
+        console.log('Datos migrados al nuevo formato de 5 criterios');
+    }
+}
+
+/**
  * Carga los datos guardados en los formularios
  */
 function loadSavedData() {
+    // Migrar datos antiguos primero
+    migrateOldData();
+    
     const projectNameInput = document.getElementById('projectName');
     if (projectNameInput) {
         projectNameInput.value = data.projectName || '';
     }
     
-    // Cargar criterios
+    // Cargar criterios (ahora hasta el 5to)
     document.querySelectorAll('.criterio').forEach(el => {
-        el.value = data[`criterio${el.dataset.id}`] || '';
+        const id = el.dataset.id;
+        if (id && parseInt(id) <= NUM_CRITERIOS) {
+            el.value = data[`criterio${id}`] || '';
+        }
     });
     
-    // Cargar pesos
+    // Cargar pesos (ahora hasta el 5to)
     document.querySelectorAll('.peso').forEach(el => {
-        el.value = data[`peso${el.dataset.id}`] || '';
+        const id = el.dataset.id;
+        if (id && parseInt(id) <= NUM_CRITERIOS) {
+            el.value = data[`peso${id}`] || '';
+        }
     });
     
     // Cargar conceptos
@@ -258,3 +287,4 @@ document.addEventListener('DOMContentLoaded', initializePage);
 window.updateProjectName = updateProjectName;
 window.validateAndEnable = validateAndEnable;
 window.saveAndContinue = saveAndContinue;
+window.NUM_CRITERIOS = NUM_CRITERIOS;

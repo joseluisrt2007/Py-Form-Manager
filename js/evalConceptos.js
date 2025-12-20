@@ -137,11 +137,17 @@ function generarTablas() {
                     </tr>
                 </thead>
                 <tbody>
-                    ${[1, 2, 3, 4].map(i => {
-                        const dataKey = `ca${(col - 1) * 4 + i}`;
+                    ${[1, 2, 3, 4, 5].map(i => {
+                        // La clave se guarda como ca1, ca2, ca3, etc. para cada concepto formado
+                        // Para 3 conceptos formados: 
+                        // Concepto 1: ca1, ca2, ca3, ca4, ca5 (criterios 1-5)
+                        // Concepto 2: ca6, ca7, ca8, ca9, ca10 (criterios 1-5)
+                        // Concepto 3: ca11, ca12, ca13, ca14, ca15 (criterios 1-5)
+                        const criterioIndex = i;
+                        const dataKey = `ca${(col - 1) * 5 + i}`;
                         const savedValue = data[dataKey] || '';
-                        const criterioText = data[`criterio${i}`] || 
-                            ((typeof t === 'function') ? `${t('criteria') || 'Criterio'} ${i}` : `Criterio ${i}`);
+                        const criterioText = data[`criterio${criterioIndex}`] || 
+                            ((typeof t === 'function') ? `${t('criteria') || 'Criterio'} ${criterioIndex}` : `Criterio ${criterioIndex}`);
                         
                         const placeholderText = (typeof t === 'function') 
                             ? t('enter_rating') || 'Ingresa calificación' 
@@ -149,10 +155,10 @@ function generarTablas() {
                         
                         return `
                             <tr>
-                                <td>${i}</td>
+                                <td>${criterioIndex}</td>
                                 <td>${criterioText}</td>
                                 <td>
-                                    <input type="number" class="calif" data-conc="${col}" data-crit="${i}" 
+                                    <input type="number" class="calif" data-conc="${col}" data-crit="${criterioIndex}" 
                                            min="0" max="10" step="0.1" value="${savedValue}" 
                                            placeholder="${placeholderText}" data-i18n-placeholder="enter_rating">
                                 </td>
@@ -249,7 +255,8 @@ function calcular(conc) {
     let total = 0;
     let valid = true;
     
-    for (let i = 1; i <= 4; i++) {
+    // Ahora tenemos 5 criterios (1-5) en lugar de 4 (1-4)
+    for (let i = 1; i <= 5; i++) {
         const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
         if (!input) continue;
         
@@ -267,7 +274,9 @@ function calcular(conc) {
     if (resultElement) {
         if (valid) {
             resultElement.textContent = total.toFixed(2);
-            data[`resultado${conc + 3}`] = total.toFixed(2);  // resultado4,5,6
+            // Guardar resultado en datos
+            // Conceptos formados 1-3 se guardan como resultado4, resultado5, resultado6
+            data[`resultado${conc + 3}`] = total.toFixed(2);
         } else {
             alertT('error_ratings_range');
         }
@@ -283,7 +292,8 @@ function recalcularTodo() {
     for (let conc = 1; conc <= 3; conc++) {
         let hasData = false;
         
-        for (let i = 1; i <= 4; i++) {
+        // Verificar si hay datos en alguno de los 5 criterios
+        for (let i = 1; i <= 5; i++) {
             const input = document.querySelector(`input[data-conc="${conc}"][data-crit="${i}"]`);
             if (input && input.value !== '') {
                 hasData = true;
@@ -336,7 +346,8 @@ function saveAndContinue() {
         const conc = input.dataset.conc;
         const crit = input.dataset.crit;
         if (conc && crit) {
-            const dataKey = `ca${(parseInt(conc) - 1) * 4 + parseInt(crit)}`;
+            // Guardar como ca1, ca2, ca3... ca15 (5 criterios × 3 conceptos formados)
+            const dataKey = `ca${(parseInt(conc) - 1) * 5 + parseInt(crit)}`;
             data[dataKey] = input.value;
         }
     });

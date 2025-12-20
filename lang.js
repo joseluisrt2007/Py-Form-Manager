@@ -47,9 +47,9 @@ const translations = {
         'idea': 'Idea',
         'rating': 'Calificación (0-10)',
         'result': 'Resultado',
-        'option': 'Opción',
+        'option': 'Concepto',
         'possibilities': 'Explorar posibilidades',
-        'tasks_responsibles': 'Tabla de tareas y responsables',
+        'tasks_responsibles': 'Enlace de entradas y salidas a trevés de funciones/tareas',
         
         // =================== CONCEPTOS ===================
         'best_concept': 'Mejor Concepto',
@@ -73,8 +73,8 @@ const translations = {
         
         // =================== DIAGRAMA/TAREAS ===================
         'task': 'Tarea',
-        'responsable_label': 'Responsable/Entrada',
-        'task_label': 'Tarea',
+        'responsable_label': 'Entrada',
+        'task_label': 'Funcion/Tarea',
         'salida_label': 'Salida', // NUEVO
         'enter_salida': 'Describe la salida', // NUEVO
         'tasks_1_15': 'Tareas 1-15',
@@ -172,9 +172,9 @@ const translations = {
         'idea': 'Idea',
         'rating': 'Rating (0-10)',
         'result': 'Result',
-        'option': 'Option',
+        'option': 'Concept',
         'possibilities': 'Explore possibilities',
-        'tasks_responsibles': 'Table of tasks and responsibles',
+        'tasks_responsibles': 'Linking inputs and outputs through functions/tasks',
         
         // =================== CONCEPTS ===================
         'best_concept': 'Best Concept',
@@ -198,8 +198,8 @@ const translations = {
         
         // =================== DIAGRAM/TASKS ===================
         'task': 'Task',
-        'responsable_label': 'Responsible/Input',
-        'task_label': 'Task',
+        'responsable_label': 'Input',
+        'task_label': 'Function/Task',
         'salida_label': 'Output', // NUEVO
         'enter_salida': 'Describe the output', // NUEJO
         'tasks_1_15': 'Tasks 1-15',
